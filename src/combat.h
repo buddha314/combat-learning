@@ -15,9 +15,10 @@ public:
   int ssn;  // the player id, will be serial at first
   int str, con, dex, wis, itl, cha;
   int ac, hp;
-  //dlib::matrix <int, 0,1> combatLabels;
-  dlib::matrix <int> combatLabels;
-  dlib::matrix <double, 0, nFeatures> combatLog;
+  //dlib::matrix <double, 0, nFeatures> combatLog;
+  std::vector<int> combatLabels;
+  std::vector<std::vector<int>> combatLog;
+  std::vector<int> getFeatures();
 };
 
 

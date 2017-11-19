@@ -74,7 +74,18 @@ Player::Player(int id, std::string n) {
 
   ac = 10 + abilityMods[dex];
   hp = rollDie(1,10) + abilityMods[con];
-  combatLabels.set_size(1,0);
+  //combatLabels.set_size(1,0);
+}
+
+std::vector<int> Player::getFeatures() {
+  std::vector<int> v;
+  v.push_back(str);
+  v.push_back(con);
+  v.push_back(dex);
+  v.push_back(wis);
+  v.push_back(itl);
+  v.push_back(cha);
+  return v;
 }
 
 /**
@@ -94,31 +105,22 @@ int fight(Player &me, Player &you) {
     combatTurn(you, me);
   }
 
-
-  int menr, younr;
-  menr = me.combatLabels.nr();
-  younr = you.combatLabels.nr();
-  std::cout<< "  menr/younr: " << menr << "/" << younr << std::endl;
-  //me.combatLabels.set_size(menr, 1);
-  //you.combatLabels.set_size(younr, 1);
+  me.combatLog.push_back(you.getFeatures());
+  you.combatLog.push_back(me.getFeatures());
 
   if (me.hp > you.hp) {
-    std::cout << "Me won..." << std::endl;
-    me.combatLabels(menr, 0) = 4;
-    you.combatLabels(younr, 0) = 2;
+    //std::cout << "Me won..." << std::endl;
+    me.combatLabels.push_back(1);
+    you.combatLabels.push_back(0);
   }   else if (me.hp < you.hp) {
-    std::cout << "You won..." << std::endl;
-    me.combatLabels(menr, 0) = 6;
-    you.combatLabels(younr, 0) = 8;
+    //std::cout << "You won..." << std::endl;
+    me.combatLabels.push_back(0);
+    you.combatLabels.push_back(1);
   } else {
-    std::cout << "Nobody won..." << std::endl;
-    me.combatLabels(menr, 0) = 10;
-    you.combatLabels(younr, 0) = 10;
+    //std::cout << "Nobody won..." << std::endl;
+    me.combatLabels.push_back(0);
+    you.combatLabels.push_back(0);
   }
-
-  me.combatLabels.set_size(menr+1, 0);
-  you.combatLabels.set_size(younr+1, 0);
-
   return 0;
 }
 
@@ -180,12 +182,15 @@ int run_tournament(std::vector<Player> &players) {
 
 void report(std::vector<Player> players) {
   for (std::vector<Player>::iterator it = players.begin() ; it != players.end(); ++it) {
+    int w = 0;
+    for (auto& n : it->combatLabels) w += n;
     std::cout << it->name  << ": " << std::endl
       <<  " hp: " << it->hp
       << " str: " << it->str
       << " dex: " << it->dex
       << " con: " << it->con
-      << " clabels: " << it->combatLabels(0,0)
+      << " fights: " << it->combatLabels.size()
+      << " wins: " << w
       << std::endl;
   }
 }
