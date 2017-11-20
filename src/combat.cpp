@@ -88,6 +88,46 @@ std::vector<int> Player::getFeatures() {
   return v;
 }
 
+void Player::sleep() {
+
+  std::cout
+    << name
+    << " (m,n): " << combatLog.size() <<  " " << combatLog[0].size() << std::endl;
+  int m, n;
+  m = combatLog.size();
+  n = combatLog[0].size();
+
+  //typedef dlib::matrix<double> sample_type(n,1);
+  //typedef dlib::radial_basis_kernel<sample_type> kernel_type;
+
+  dlib::matrix<int> M(m,n);
+  for (int r = 0; r < m; r++) {
+    for (int c = 0; c < n; c++) {
+      /*
+      std::cout << " r/c/v " << r
+        << " / " << c
+        << " / " << combatLog[r][c]
+        << std::endl;
+        */
+      M(r,c) = combatLog[r][c];
+    }
+  }
+  /*
+  dlib::vector_normalizer<std::vector<double>> normalizer;
+  std::vector<std::vector<double>> samples;
+  */
+}
+
+double combatTraining(Player &player) {
+  const int m = player.combatLog.size();
+  //int m,n;
+  //m = player.combatLog.size();
+  //n = player.combatLog[0].size();
+  const int n = player.combatLog[0].size();
+  dlib::matrix<double, m,n> M;
+  return 0.0;
+}
+
 /**
  The primary combat routine.  Based (obviously) on D&D rules but a bit simpler.
  */
@@ -110,16 +150,16 @@ int fight(Player &me, Player &you) {
 
   if (me.hp > you.hp) {
     //std::cout << "Me won..." << std::endl;
-    me.combatLabels.push_back(1);
-    you.combatLabels.push_back(0);
+    me.combatLabels.push_back(1.0);
+    you.combatLabels.push_back(0.);
   }   else if (me.hp < you.hp) {
     //std::cout << "You won..." << std::endl;
-    me.combatLabels.push_back(0);
-    you.combatLabels.push_back(1);
+    me.combatLabels.push_back(0.);
+    you.combatLabels.push_back(1.0);
   } else {
     //std::cout << "Nobody won..." << std::endl;
-    me.combatLabels.push_back(0);
-    you.combatLabels.push_back(0);
+    me.combatLabels.push_back(0.);
+    you.combatLabels.push_back(0.);
   }
   return 0;
 }
@@ -169,6 +209,7 @@ std::vector<Player> init() {
 
 int run_tournament(std::vector<Player> &players) {
   for (int t = 0; t < n_training_rounds; t++) {
+    // This pairs everyone against each other for the moment.
     for (std::vector<Player>::iterator m = players.begin(); m != players.end(); ++m) {
       for (std::vector<Player>::iterator y = m; y != players.end(); ++y) {
         Player &me = *m;
@@ -176,6 +217,11 @@ int run_tournament(std::vector<Player> &players) {
         int winner = fight(me, you);
       }
     }
+    for (std::vector<Player>::iterator m = players.begin(); m != players.end(); ++m) {
+      Player &me = *m;
+      m->sleep();
+    }
+
   }
   return 0;
 }
